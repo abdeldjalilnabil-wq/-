@@ -1,0 +1,854 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global safety net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        || request.auth.token.email == 'abdeldjalilnabil@gmail.com'
+      );
+    }
+
+    // Validation Blueprints
+    function isValidPlatformSettings(data) {
+      return data.keys().hasAll([
+          'appName', 'appTagline', 'ownerName', 'designerName',
+          'pricingEnabled', 'usagePrice', 'currency', 'billingCycle',
+          'paymentInstructions', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'appName', 'appTagline', 'ownerName', 'ownerPhone',
+          'designerName', 'designerLocation', 'designerInstagram',
+          'pricingEnabled', 'usagePrice', 'currency', 'billingCycle',
+          'paymentInstructions',
+          'autoApproveCardPayments', 'baridiMobRip', 'ccpAccount',
+          'chargilyPayUrl', 'stripeCheckoutUrl', 'paypalLink', 'wiseIban',
+          'heroTitle', 'heroSubtitle', 'footerNote', 'defaultTheme', 'defaultLanguage',
+          'allowVoiceCalls', 'allowWhatsApp', 'allowInAppMessages',
+          'allowDeferTurn', 'allowComplaints', 'allowBarberSocials',
+          'allowLocationFilter', 'allowNewBarberRegistration', 'allowAppDownload',
+          'androidDownloadUrl', 'iosDownloadUrl', 'desktopDownloadUrl',
+          'maintenanceMode', 'maintenanceMessage',
+          'serviceHaircutLabel', 'serviceProteinLabel',
+          'serviceBlowdryLabel', 'serviceAllLabel',
+          'updatedAt'
+        ])
+        && data.appName is string && data.appName.size() >= 2 && data.appName.size() <= 60
+        && data.appTagline is string && data.appTagline.size() <= 140
+        && data.ownerName is string && data.ownerName.size() >= 1 && data.ownerName.size() <= 80
+        && (!('ownerPhone' in data) || (data.ownerPhone is string && data.ownerPhone.size() <= 25))
+        && data.designerName is string && data.designerName.size() >= 1 && data.designerName.size() <= 80
+        && (!('designerLocation' in data) || (data.designerLocation is string && data.designerLocation.size() <= 80))
+        && (!('designerInstagram' in data) || (data.designerInstagram is string && data.designerInstagram.size() <= 60))
+        && data.pricingEnabled is bool
+        && data.usagePrice is number && data.usagePrice >= 0 && data.usagePrice <= 1000000
+        && data.currency is string && data.currency.size() >= 1 && data.currency.size() <= 20
+        && data.billingCycle in ['monthly', 'yearly', 'per_booking']
+        && data.paymentInstructions is string && data.paymentInstructions.size() <= 300
+        && (!('autoApproveCardPayments' in data) || data.autoApproveCardPayments is bool)
+        && (!('baridiMobRip' in data) || (data.baridiMobRip is string && data.baridiMobRip.size() <= 40))
+        && (!('ccpAccount' in data) || (data.ccpAccount is string && data.ccpAccount.size() <= 40))
+        && (!('chargilyPayUrl' in data) || (data.chargilyPayUrl is string && data.chargilyPayUrl.size() <= 240))
+        && (!('stripeCheckoutUrl' in data) || (data.stripeCheckoutUrl is string && data.stripeCheckoutUrl.size() <= 240))
+        && (!('paypalLink' in data) || (data.paypalLink is string && data.paypalLink.size() <= 140))
+        && (!('wiseIban' in data) || (data.wiseIban is string && data.wiseIban.size() <= 100))
+        && (!('heroTitle' in data) || (data.heroTitle is string && data.heroTitle.size() <= 140))
+        && (!('heroSubtitle' in data) || (data.heroSubtitle is string && data.heroSubtitle.size() <= 300))
+        && (!('footerNote' in data) || (data.footerNote is string && data.footerNote.size() <= 140))
+        && (!('defaultTheme' in data) || data.defaultTheme in ['gold', 'emerald', 'blue', 'burgundy', 'dark'])
+        && (!('defaultLanguage' in data) || (data.defaultLanguage is string && data.defaultLanguage.size() >= 2 && data.defaultLanguage.size() <= 10))
+        && (!('allowVoiceCalls' in data) || data.allowVoiceCalls is bool)
+        && (!('allowWhatsApp' in data) || data.allowWhatsApp is bool)
+        && (!('allowInAppMessages' in data) || data.allowInAppMessages is bool)
+        && (!('allowDeferTurn' in data) || data.allowDeferTurn is bool)
+        && (!('allowComplaints' in data) || data.allowComplaints is bool)
+        && (!('allowBarberSocials' in data) || data.allowBarberSocials is bool)
+        && (!('allowLocationFilter' in data) || data.allowLocationFilter is bool)
+        && (!('allowNewBarberRegistration' in data) || data.allowNewBarberRegistration is bool)
+        && (!('allowAppDownload' in data) || data.allowAppDownload is bool)
+        && (!('androidDownloadUrl' in data) || (data.androidDownloadUrl is string && data.androidDownloadUrl.size() <= 240))
+        && (!('iosDownloadUrl' in data) || (data.iosDownloadUrl is string && data.iosDownloadUrl.size() <= 240))
+        && (!('desktopDownloadUrl' in data) || (data.desktopDownloadUrl is string && data.desktopDownloadUrl.size() <= 240))
+        && (!('maintenanceMode' in data) || data.maintenanceMode is bool)
+        && (!('maintenanceMessage' in data) || (data.maintenanceMessage is string && data.maintenanceMessage.size() <= 240))
+        && (!('serviceHaircutLabel' in data) || (data.serviceHaircutLabel is string && data.serviceHaircutLabel.size() <= 50))
+        && (!('serviceProteinLabel' in data) || (data.serviceProteinLabel is string && data.serviceProteinLabel.size() <= 50))
+        && (!('serviceBlowdryLabel' in data) || (data.serviceBlowdryLabel is string && data.serviceBlowdryLabel.size() <= 50))
+        && (!('serviceAllLabel' in data) || (data.serviceAllLabel is string && data.serviceAllLabel.size() <= 60))
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'phone', 'accountMode', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'uid', 'displayName', 'phone', 'accountMode', 'barberId',
+          'themeColor', 'preferredLanguage', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.uid == request.auth.uid
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80
+        && data.phone is string && data.phone.size() <= 25
+        && data.accountMode in ['customer', 'barber']
+        && (!('barberId' in data) || (data.barberId is string && data.barberId.size() <= 128))
+        && (!('themeColor' in data) || data.themeColor in ['gold', 'emerald', 'blue', 'burgundy', 'dark'])
+        && (!('preferredLanguage' in data) || (data.preferredLanguage is string && data.preferredLanguage.size() >= 2 && data.preferredLanguage.size() <= 10))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidBarberShop(data) {
+      return data.keys().hasAll([
+          'ownerUid', 'shopName', 'barberName', 'location', 'avatarUrl',
+          'isOpen', 'isPublished', 'waitingCount', 'nowServingNumber',
+          'nextTicketCounter', 'activeCallTicketId', 'activeCallNumber',
+          'avgMinutesPerClient', 'services', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerUid', 'shopName', 'barberName',
+          'countryCode', 'countryName', 'stateName', 'location', 'avatarUrl',
+          'whatsappCountryCode', 'barberPhone',
+          'facebookUrl', 'tiktokUrl', 'instagramUrl',
+          'isOpen', 'isPublished', 'subscriptionStatus', 'lastPaymentId',
+          'waitingCount', 'nowServingNumber',
+          'nextTicketCounter', 'activeCallTicketId', 'activeCallNumber',
+          'avgMinutesPerClient', 'services', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerUid)
+        && data.shopName is string && data.shopName.size() >= 2 && data.shopName.size() <= 80
+        && data.barberName is string && data.barberName.size() >= 2 && data.barberName.size() <= 80
+        && (!('countryCode' in data) || (data.countryCode is string && data.countryCode.size() <= 10))
+        && (!('countryName' in data) || (data.countryName is string && data.countryName.size() <= 80))
+        && (!('stateName' in data) || (data.stateName is string && data.stateName.size() <= 100))
+        && data.location is string && data.location.size() >= 2 && data.location.size() <= 160
+        && data.avatarUrl is string && data.avatarUrl.size() <= 80000
+        && (!('whatsappCountryCode' in data) || (data.whatsappCountryCode is string && data.whatsappCountryCode.size() <= 6))
+        && (!('barberPhone' in data) || (data.barberPhone is string && data.barberPhone.size() <= 25))
+        && (!('facebookUrl' in data) || (data.facebookUrl is string && data.facebookUrl.size() <= 200))
+        && (!('tiktokUrl' in data) || (data.tiktokUrl is string && data.tiktokUrl.size() <= 200))
+        && (!('instagramUrl' in data) || (data.instagramUrl is string && data.instagramUrl.size() <= 200))
+        && data.isOpen is bool
+        && data.isPublished is bool
+        && (!('subscriptionStatus' in data) || data.subscriptionStatus in ['active', 'pending', 'suspended'])
+        && (!('lastPaymentId' in data) || (data.lastPaymentId is string && data.lastPaymentId.size() <= 128))
+        && data.waitingCount is int && data.waitingCount >= 0 && data.waitingCount <= 1000
+        && data.nowServingNumber is int && data.nowServingNumber >= 0 && data.nowServingNumber <= 1000000
+        && data.nextTicketCounter is int && data.nextTicketCounter >= 1 && data.nextTicketCounter <= 1000000
+        && data.activeCallTicketId is string && data.activeCallTicketId.size() <= 128
+        && data.activeCallNumber is int && data.activeCallNumber >= 0 && data.activeCallNumber <= 1000000
+        && data.avgMinutesPerClient is int && data.avgMinutesPerClient >= 5 && data.avgMinutesPerClient <= 180
+        && data.services is list && data.services.size() >= 1 && data.services.size() <= 4
+        && data.services.hasOnly(['haircut', 'protein', 'blowdry', 'all'])
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSubscriptionPayment(data) {
+      return data.keys().hasAll([
+          'id', 'barberId', 'barberUid', 'shopName', 'payerName',
+          'region', 'paymentMethod', 'referenceCode',
+          'amount', 'currency', 'billingCycle', 'status',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'barberId', 'barberUid', 'shopName', 'payerName',
+          'region', 'paymentMethod', 'cardBrand', 'cardLast4',
+          'referenceCode', 'amount', 'currency', 'billingCycle',
+          'status', 'note', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidId(data.barberId)
+        && isValidId(data.barberUid)
+        && data.shopName is string && data.shopName.size() >= 1 && data.shopName.size() <= 80
+        && data.payerName is string && data.payerName.size() >= 2 && data.payerName.size() <= 80
+        && data.region in ['algeria', 'international']
+        && data.paymentMethod in [
+          'edahabia', 'cib', 'baridimob',
+          'visa', 'mastercard', 'amex', 'unionpay', 'discover', 'jcb', 'mir',
+          'paypal', 'wise_paysera', 'apple_pay', 'google_pay'
+        ]
+        && (!('cardBrand' in data) || (data.cardBrand is string && data.cardBrand.size() <= 30))
+        && (!('cardLast4' in data) || (data.cardLast4 is string && data.cardLast4.size() <= 4 && data.cardLast4.matches('^$|^[0-9]{4}$')))
+        && data.referenceCode is string && data.referenceCode.size() >= 2 && data.referenceCode.size() <= 80
+        && data.amount is number && data.amount >= 0 && data.amount <= 10000000
+        && data.currency is string && data.currency.size() >= 1 && data.currency.size() <= 20
+        && data.billingCycle in ['monthly', 'yearly', 'per_booking']
+        && data.status in ['paid', 'pending_review', 'rejected']
+        && (!('note' in data) || (data.note is string && data.note.size() <= 240))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidQueueTicket(data) {
+      return data.keys().hasAll([
+          'id', 'barberId', 'barberUid', 'shopName', 'barberLocation',
+          'customerUid', 'customerName', 'customerPhone', 'serviceType',
+          'status', 'ticketNumber', 'queueOrder', 'deferCount', 'callCount',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'barberId', 'barberUid', 'shopName', 'barberLocation',
+          'customerUid', 'customerName', 'customerPhone', 'serviceType',
+          'status', 'ticketNumber', 'queueOrder', 'deferCount', 'callCount',
+          'lastBarberMessage', 'lastBarberMessageAt',
+          'lastCalledAt', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidId(data.barberId)
+        && isValidId(data.barberUid)
+        && data.shopName is string && data.shopName.size() >= 1 && data.shopName.size() <= 80
+        && data.barberLocation is string && data.barberLocation.size() >= 1 && data.barberLocation.size() <= 160
+        && isValidId(data.customerUid)
+        && data.customerName is string && data.customerName.size() >= 2 && data.customerName.size() <= 60
+        && data.customerPhone is string && data.customerPhone.size() >= 6 && data.customerPhone.size() <= 25
+        && data.customerPhone.matches('^[0-9+\\-\\s()]{6,25}$')
+        && data.serviceType in ['haircut', 'protein', 'blowdry', 'all']
+        && data.status in ['waiting', 'called', 'in_chair', 'completed', 'cancelled']
+        && data.ticketNumber is int && data.ticketNumber >= 1 && data.ticketNumber <= 1000000
+        && data.queueOrder is number && data.queueOrder > 0
+        && data.deferCount is int && data.deferCount >= 0 && data.deferCount <= 20
+        && data.callCount is int && data.callCount >= 0 && data.callCount <= 20
+        && (!('lastBarberMessage' in data) || (data.lastBarberMessage is string && data.lastBarberMessage.size() <= 400))
+        && (!('lastBarberMessageAt' in data) || data.lastBarberMessageAt is timestamp)
+        && (!('lastCalledAt' in data) || data.lastCalledAt is timestamp)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidQueueSlot(data) {
+      return data.keys().hasAll([
+          'ticketId', 'barberId', 'barberUid', 'customerUid',
+          'ticketNumber', 'queueOrder', 'serviceType', 'status',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ticketId', 'barberId', 'barberUid', 'customerUid',
+          'ticketNumber', 'queueOrder', 'serviceType', 'status',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ticketId)
+        && isValidId(data.barberId)
+        && isValidId(data.barberUid)
+        && isValidId(data.customerUid)
+        && data.ticketNumber is int && data.ticketNumber >= 1 && data.ticketNumber <= 1000000
+        && data.queueOrder is number && data.queueOrder > 0
+        && data.serviceType in ['haircut', 'protein', 'blowdry', 'all']
+        && data.status in ['waiting', 'called', 'in_chair', 'completed', 'cancelled']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTicketMessage(data) {
+      return data.keys().hasAll([
+          'id', 'ticketId', 'barberId', 'barberUid', 'customerUid',
+          'senderUid', 'senderRole', 'senderName', 'text', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'ticketId', 'barberId', 'barberUid', 'customerUid',
+          'senderUid', 'senderRole', 'senderName', 'text', 'createdAt'
+        ])
+        && isValidId(data.id)
+        && isValidId(data.ticketId)
+        && isValidId(data.barberId)
+        && isValidId(data.barberUid)
+        && isValidId(data.customerUid)
+        && isValidId(data.senderUid)
+        && data.senderRole in ['barber', 'customer']
+        && data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 80
+        && data.text is string && data.text.size() >= 1 && data.text.size() <= 400
+        && data.createdAt is timestamp;
+    }
+
+    function isValidVoiceCall(data) {
+      return data.keys().hasAll([
+          'id', 'barberId', 'barberUid', 'customerUid', 'ticketId',
+          'shopName', 'customerName', 'status', 'offerSdp',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'barberId', 'barberUid', 'customerUid', 'ticketId',
+          'shopName', 'customerName', 'status', 'offerSdp', 'answerSdp', 'endedByUid',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidId(data.barberId)
+        && isValidId(data.barberUid)
+        && isValidId(data.customerUid)
+        && isValidId(data.ticketId)
+        && data.shopName is string && data.shopName.size() >= 1 && data.shopName.size() <= 80
+        && data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 60
+        && data.status in ['ringing', 'connected', 'ended', 'declined', 'missed']
+        && data.offerSdp is string && data.offerSdp.size() >= 1 && data.offerSdp.size() <= 15000
+        && (!('answerSdp' in data) || (data.answerSdp is string && data.answerSdp.size() <= 15000))
+        && (!('endedByUid' in data) || (data.endedByUid is string && data.endedByUid.size() <= 128))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidIceCandidateDoc(data) {
+      return data.keys().hasAll([
+          'barberUid', 'customerUid', 'senderUid', 'candidate', 'sdpMid', 'sdpMLineIndex', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'barberUid', 'customerUid', 'senderUid', 'candidate', 'sdpMid', 'sdpMLineIndex', 'createdAt'
+        ])
+        && isValidId(data.barberUid)
+        && isValidId(data.customerUid)
+        && isValidId(data.senderUid)
+        && data.candidate is string && data.candidate.size() >= 1 && data.candidate.size() <= 2000
+        && data.sdpMid is string && data.sdpMid.size() <= 100
+        && data.sdpMLineIndex is int && data.sdpMLineIndex >= 0 && data.sdpMLineIndex <= 20
+        && data.createdAt is timestamp;
+    }
+
+    function isValidBarberComplaint(data) {
+      return data.keys().hasAll([
+          'id', 'barberId', 'barberUid', 'shopName', 'customerUid', 'customerName',
+          'complaintType', 'details', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'barberId', 'barberUid', 'shopName', 'customerUid', 'customerName',
+          'complaintType', 'details', 'status', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidId(data.barberId)
+        && isValidId(data.barberUid)
+        && data.shopName is string && data.shopName.size() >= 1 && data.shopName.size() <= 80
+        && isValidId(data.customerUid)
+        && data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 60
+        && data.complaintType is string && data.complaintType.size() >= 2 && data.complaintType.size() <= 80
+        && data.details is string && data.details.size() >= 5 && data.details.size() <= 500
+        && data.status in ['open', 'reviewed', 'resolved']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Platform Owner Settings (public single settings doc, admin-only write)
+    match /platform/{configId} {
+      allow get: if isValidId(configId) && configId == 'settings';
+      allow list: if false;
+      allow create, update: if isAdmin()
+        && isValidId(configId)
+        && configId == 'settings'
+        && isValidPlatformSettings(incoming())
+        && incoming().updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Admins collection (read-only by self)
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && request.auth.uid == adminId;
+      allow list: if false;
+      allow write: if false;
+    }
+
+    // Users collection (private PII)
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false;
+      allow create: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidUserProfile(incoming())
+        && incoming().uid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidUserProfile(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'displayName', 'phone', 'accountMode', 'barberId',
+          'themeColor', 'preferredLanguage', 'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    // Barbers collection (public storefront directory + live queue counters)
+    match /barbers/{barberId} {
+      allow get: if isSignedIn() && isValidId(barberId);
+      allow list: if isSignedIn() && resource.data.isPublished == true;
+      allow create: if isVerifiedUser()
+        && isValidId(barberId)
+        && barberId == request.auth.uid
+        && isValidBarberShop(incoming())
+        && incoming().ownerUid == request.auth.uid
+        && (!('subscriptionStatus' in incoming()) || incoming().subscriptionStatus in ['active', 'pending'])
+        && incoming().waitingCount == 0
+        && incoming().nowServingNumber == 0
+        && incoming().nextTicketCounter == 1
+        && incoming().activeCallTicketId == ''
+        && incoming().activeCallNumber == 0
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin()
+          || !exists(/databases/$(database)/documents/platform/settings)
+          || !('allowNewBarberRegistration' in get(/databases/$(database)/documents/platform/settings).data)
+          || get(/databases/$(database)/documents/platform/settings).data.allowNewBarberRegistration == true
+        );
+      allow update: if isVerifiedUser()
+        && isValidId(barberId)
+        && isValidBarberShop(incoming())
+        && incoming().ownerUid == existing().ownerUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Tier 0: Platform Owner Admin can manage barber subscription & visibility
+          (
+            isAdmin()
+            && incoming().diff(existing()).affectedKeys().hasOnly(['subscriptionStatus', 'isOpen', 'isPublished', 'updatedAt'])
+          )
+          ||
+          // Tier 1: Barber shop owner can update profile and queue state (cannot self-activate if suspended)
+          (
+            existing().ownerUid == request.auth.uid
+            && (!('subscriptionStatus' in incoming()) || !('subscriptionStatus' in existing()) || incoming().subscriptionStatus == existing().subscriptionStatus)
+            && incoming().diff(existing()).affectedKeys().hasOnly([
+              'shopName', 'barberName',
+              'countryCode', 'countryName', 'stateName', 'location', 'avatarUrl',
+              'whatsappCountryCode', 'barberPhone',
+              'facebookUrl', 'tiktokUrl', 'instagramUrl',
+              'isOpen', 'isPublished', 'waitingCount', 'nowServingNumber', 'nextTicketCounter',
+              'activeCallTicketId', 'activeCallNumber', 'avgMinutesPerClient', 'services', 'updatedAt'
+            ])
+          )
+          ||
+          // Tier 1b: Barber shop owner submits electronic payment (recording lastPaymentId, optional instant activation if autoApproveCardPayments == true & non-suspended)
+          (
+            existing().ownerUid == request.auth.uid
+            && ('lastPaymentId' in incoming())
+            && isValidId(incoming().lastPaymentId)
+            && existsAfter(/databases/$(database)/documents/barbers/$(barberId)/payments/$(incoming().lastPaymentId))
+            && getAfter(/databases/$(database)/documents/barbers/$(barberId)/payments/$(incoming().lastPaymentId)).data.barberUid == request.auth.uid
+            && (
+              (
+                incoming().diff(existing()).affectedKeys().hasOnly(['lastPaymentId', 'updatedAt'])
+              )
+              ||
+              (
+                existing().subscriptionStatus != 'suspended'
+                && incoming().diff(existing()).affectedKeys().hasOnly(['lastPaymentId', 'subscriptionStatus', 'isOpen', 'updatedAt'])
+                && incoming().subscriptionStatus == 'active'
+                && getAfter(/databases/$(database)/documents/barbers/$(barberId)/payments/$(incoming().lastPaymentId)).data.status == 'paid'
+                && exists(/databases/$(database)/documents/platform/settings)
+                && (!('autoApproveCardPayments' in get(/databases/$(database)/documents/platform/settings).data) || get(/databases/$(database)/documents/platform/settings).data.autoApproveCardPayments == true)
+                && getAfter(/databases/$(database)/documents/barbers/$(barberId)/payments/$(incoming().lastPaymentId)).data.amount >= get(/databases/$(database)/documents/platform/settings).data.usagePrice
+              )
+            )
+          )
+          ||
+          // Tier 2a: Customer booking a new seat atomically creates matching deterministic ticket
+          (
+            existing().isOpen == true
+            && incoming().diff(existing()).affectedKeys().hasOnly(['waitingCount', 'nextTicketCounter', 'updatedAt'])
+            && incoming().waitingCount == existing().waitingCount + 1
+            && incoming().nextTicketCounter == existing().nextTicketCounter + 1
+            && existsAfter(/databases/$(database)/documents/barbers/$(barberId)/queue/$(request.auth.uid + '_' + string(existing().nextTicketCounter)))
+          )
+          ||
+          // Tier 2b: Called customer confirming arrival, deferring, or cancelling their active call
+          (
+            existing().activeCallTicketId != ''
+            && incoming().diff(existing()).affectedKeys().hasOnly(['waitingCount', 'activeCallTicketId', 'activeCallNumber', 'updatedAt'])
+            && incoming().activeCallTicketId == ''
+            && incoming().activeCallNumber == 0
+            && (incoming().waitingCount == existing().waitingCount || incoming().waitingCount == existing().waitingCount - 1)
+            && get(/databases/$(database)/documents/barbers/$(barberId)/queue/$(existing().activeCallTicketId)).data.customerUid == request.auth.uid
+          )
+          ||
+          // Tier 2c: Waiting customer cancelling their seat decrements waitingCount by 1
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['waitingCount', 'updatedAt'])
+            && incoming().waitingCount == existing().waitingCount - 1
+            && incoming().waitingCount >= 0
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(barberId) && (existing().ownerUid == request.auth.uid || isAdmin());
+
+      // Barber Electronic Subscription Payments (PCI-safe, owner-isolated + admin review)
+      match /payments/{paymentId} {
+        allow get: if isSignedIn()
+          && isValidId(barberId)
+          && isValidId(paymentId)
+          && (existing().barberUid == request.auth.uid || isAdmin());
+        allow list: if isSignedIn()
+          && (resource.data.barberUid == request.auth.uid || isAdmin());
+        allow create: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(paymentId)
+          && isValidSubscriptionPayment(incoming())
+          && incoming().id == paymentId
+          && incoming().barberId == barberId
+          && incoming().barberUid == request.auth.uid
+          && incoming().status in ['paid', 'pending_review']
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && exists(/databases/$(database)/documents/barbers/$(barberId))
+          && get(/databases/$(database)/documents/barbers/$(barberId)).data.ownerUid == request.auth.uid
+          && (
+            incoming().status == 'pending_review'
+            || (
+              incoming().status == 'paid'
+              && (
+                !exists(/databases/$(database)/documents/platform/settings)
+                || incoming().amount >= get(/databases/$(database)/documents/platform/settings).data.usagePrice
+              )
+            )
+          );
+        allow update: if isAdmin()
+          && isValidId(barberId)
+          && isValidId(paymentId)
+          && isValidSubscriptionPayment(incoming())
+          && incoming().id == existing().id
+          && incoming().barberId == existing().barberId
+          && incoming().barberUid == existing().barberUid
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'note', 'updatedAt']);
+        allow delete: if false;
+      }
+
+      // Customer Complaints against Barber
+      match /complaints/{complaintId} {
+        allow get: if isSignedIn()
+          && isValidId(barberId)
+          && isValidId(complaintId)
+          && (
+            existing().customerUid == request.auth.uid
+            || existing().barberUid == request.auth.uid
+            || isAdmin()
+          );
+        allow list: if isSignedIn()
+          && (
+            resource.data.customerUid == request.auth.uid
+            || resource.data.barberUid == request.auth.uid
+            || isAdmin()
+          );
+        allow create: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(complaintId)
+          && isValidBarberComplaint(incoming())
+          && incoming().id == complaintId
+          && incoming().barberId == barberId
+          && incoming().customerUid == request.auth.uid
+          && incoming().status == 'open'
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && exists(/databases/$(database)/documents/barbers/$(barberId))
+          && get(/databases/$(database)/documents/barbers/$(barberId)).data.ownerUid == incoming().barberUid
+          && (
+            !exists(/databases/$(database)/documents/platform/settings)
+            || !('allowComplaints' in get(/databases/$(database)/documents/platform/settings).data)
+            || get(/databases/$(database)/documents/platform/settings).data.allowComplaints == true
+          );
+        allow update: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(complaintId)
+          && isValidBarberComplaint(incoming())
+          && incoming().id == existing().id
+          && incoming().barberId == existing().barberId
+          && incoming().barberUid == existing().barberUid
+          && incoming().customerUid == existing().customerUid
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (existing().barberUid == request.auth.uid || isAdmin())
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+          && incoming().status in ['reviewed', 'resolved'];
+        allow delete: if false;
+      }
+
+      // Private Queue Tickets (contains customerPhone PII)
+      match /queue/{ticketId} {
+        allow get: if isSignedIn()
+          && isValidId(barberId)
+          && isValidId(ticketId)
+          && (existing().customerUid == request.auth.uid || existing().barberUid == request.auth.uid);
+        allow list: if isSignedIn()
+          && (resource.data.customerUid == request.auth.uid || resource.data.barberUid == request.auth.uid);
+        allow create: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(ticketId)
+          && isValidQueueTicket(incoming())
+          && incoming().id == ticketId
+          && incoming().barberId == barberId
+          && incoming().customerUid == request.auth.uid
+          && incoming().status == 'waiting'
+          && incoming().deferCount == 0
+          && incoming().callCount == 0
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && exists(/databases/$(database)/documents/barbers/$(barberId))
+          && get(/databases/$(database)/documents/barbers/$(barberId)).data.ownerUid == incoming().barberUid
+          && get(/databases/$(database)/documents/barbers/$(barberId)).data.isOpen == true
+          && existsAfter(/databases/$(database)/documents/barbers/$(barberId)/slots/$(ticketId));
+        allow update: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(ticketId)
+          && isValidQueueTicket(incoming())
+          && incoming().id == existing().id
+          && incoming().barberId == existing().barberId
+          && incoming().barberUid == existing().barberUid
+          && incoming().customerUid == existing().customerUid
+          && incoming().ticketNumber == existing().ticketNumber
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && existing().status != 'completed'
+          && existing().status != 'cancelled'
+          && (
+            // Tier 1: Barber advances, calls, or sends alert message to customer
+            (
+              existing().barberUid == request.auth.uid
+              && incoming().diff(existing()).affectedKeys().hasOnly([
+                'status', 'callCount', 'lastCalledAt', 'queueOrder',
+                'lastBarberMessage', 'lastBarberMessageAt', 'updatedAt'
+              ])
+            )
+            ||
+            // Tier 2a: Customer defers turn
+            (
+              existing().customerUid == request.auth.uid
+              && incoming().diff(existing()).affectedKeys().hasOnly(['queueOrder', 'deferCount', 'status', 'updatedAt'])
+              && incoming().deferCount == existing().deferCount + 1
+              && incoming().queueOrder > existing().queueOrder
+              && incoming().status == 'waiting'
+            )
+            ||
+            // Tier 2b: Customer confirms arrival when called
+            (
+              existing().customerUid == request.auth.uid
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+              && existing().status == 'called'
+              && incoming().status == 'in_chair'
+            )
+            ||
+            // Tier 2c: Customer cancels their own waiting/called ticket
+            (
+              existing().customerUid == request.auth.uid
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+              && incoming().status == 'cancelled'
+            )
+          );
+        allow delete: if false;
+
+        // Real-time direct messages for this ticket (barber <-> customer)
+        match /messages/{messageId} {
+          allow get: if isSignedIn()
+            && isValidId(barberId)
+            && isValidId(ticketId)
+            && isValidId(messageId)
+            && (existing().barberUid == request.auth.uid || existing().customerUid == request.auth.uid);
+          allow list: if isSignedIn()
+            && (resource.data.barberUid == request.auth.uid || resource.data.customerUid == request.auth.uid);
+          allow create: if isVerifiedUser()
+            && isValidId(barberId)
+            && isValidId(ticketId)
+            && isValidId(messageId)
+            && isValidTicketMessage(incoming())
+            && incoming().id == messageId
+            && incoming().ticketId == ticketId
+            && incoming().barberId == barberId
+            && incoming().senderUid == request.auth.uid
+            && incoming().createdAt == request.time
+            && exists(/databases/$(database)/documents/barbers/$(barberId)/queue/$(ticketId))
+            && get(/databases/$(database)/documents/barbers/$(barberId)/queue/$(ticketId)).data.barberUid == incoming().barberUid
+            && get(/databases/$(database)/documents/barbers/$(barberId)/queue/$(ticketId)).data.customerUid == incoming().customerUid
+            && get(/databases/$(database)/documents/barbers/$(barberId)/queue/$(ticketId)).data.status != 'completed'
+            && get(/databases/$(database)/documents/barbers/$(barberId)/queue/$(ticketId)).data.status != 'cancelled'
+            && (
+              (incoming().senderRole == 'barber' && incoming().barberUid == request.auth.uid)
+              || (incoming().senderRole == 'customer' && incoming().customerUid == request.auth.uid)
+            );
+          allow update, delete: if false;
+        }
+      }
+
+      // Online WebRTC Voice Calls (barber <-> customer)
+      match /calls/{callId} {
+        allow get: if isSignedIn()
+          && isValidId(barberId)
+          && isValidId(callId)
+          && (existing().barberUid == request.auth.uid || existing().customerUid == request.auth.uid);
+        allow list: if isSignedIn()
+          && (resource.data.barberUid == request.auth.uid || resource.data.customerUid == request.auth.uid);
+        allow create: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(callId)
+          && isValidVoiceCall(incoming())
+          && incoming().id == callId
+          && incoming().barberId == barberId
+          && incoming().barberUid == request.auth.uid
+          && incoming().status == 'ringing'
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && exists(/databases/$(database)/documents/barbers/$(barberId))
+          && get(/databases/$(database)/documents/barbers/$(barberId)).data.ownerUid == request.auth.uid
+          && exists(/databases/$(database)/documents/barbers/$(barberId)/queue/$(incoming().ticketId))
+          && get(/databases/$(database)/documents/barbers/$(barberId)/queue/$(incoming().ticketId)).data.customerUid == incoming().customerUid;
+        allow update: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(callId)
+          && isValidVoiceCall(incoming())
+          && incoming().id == existing().id
+          && incoming().barberId == existing().barberId
+          && incoming().barberUid == existing().barberUid
+          && incoming().customerUid == existing().customerUid
+          && incoming().ticketId == existing().ticketId
+          && incoming().offerSdp == existing().offerSdp
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && existing().status != 'ended'
+          && existing().status != 'declined'
+          && existing().status != 'missed'
+          && (
+            (
+              existing().customerUid == request.auth.uid
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'answerSdp', 'endedByUid', 'updatedAt'])
+              && incoming().status in ['connected', 'declined', 'ended']
+            )
+            ||
+            (
+              existing().barberUid == request.auth.uid
+              && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'endedByUid', 'updatedAt'])
+              && incoming().status in ['ended', 'missed']
+            )
+          );
+        allow delete: if false;
+
+        match /callerCandidates/{candidateId} {
+          allow get: if isSignedIn()
+            && isValidId(barberId)
+            && isValidId(callId)
+            && isValidId(candidateId)
+            && (existing().barberUid == request.auth.uid || existing().customerUid == request.auth.uid);
+          allow list: if isSignedIn()
+            && (resource.data.barberUid == request.auth.uid || resource.data.customerUid == request.auth.uid);
+          allow create: if isVerifiedUser()
+            && isValidId(barberId)
+            && isValidId(callId)
+            && isValidId(candidateId)
+            && isValidIceCandidateDoc(incoming())
+            && incoming().senderUid == request.auth.uid
+            && incoming().barberUid == request.auth.uid
+            && incoming().createdAt == request.time
+            && exists(/databases/$(database)/documents/barbers/$(barberId)/calls/$(callId))
+            && get(/databases/$(database)/documents/barbers/$(barberId)/calls/$(callId)).data.barberUid == request.auth.uid
+            && get(/databases/$(database)/documents/barbers/$(barberId)/calls/$(callId)).data.customerUid == incoming().customerUid;
+          allow update, delete: if false;
+        }
+
+        match /calleeCandidates/{candidateId} {
+          allow get: if isSignedIn()
+            && isValidId(barberId)
+            && isValidId(callId)
+            && isValidId(candidateId)
+            && (existing().barberUid == request.auth.uid || existing().customerUid == request.auth.uid);
+          allow list: if isSignedIn()
+            && (resource.data.barberUid == request.auth.uid || resource.data.customerUid == request.auth.uid);
+          allow create: if isVerifiedUser()
+            && isValidId(barberId)
+            && isValidId(callId)
+            && isValidId(candidateId)
+            && isValidIceCandidateDoc(incoming())
+            && incoming().senderUid == request.auth.uid
+            && incoming().customerUid == request.auth.uid
+            && incoming().createdAt == request.time
+            && exists(/databases/$(database)/documents/barbers/$(barberId)/calls/$(callId))
+            && get(/databases/$(database)/documents/barbers/$(barberId)/calls/$(callId)).data.customerUid == request.auth.uid
+            && get(/databases/$(database)/documents/barbers/$(barberId)/calls/$(callId)).data.barberUid == incoming().barberUid;
+          allow update, delete: if false;
+        }
+      }
+
+      // PII-Free Queue Position Slots
+      match /slots/{ticketId} {
+        allow get: if isSignedIn() && isValidId(barberId) && isValidId(ticketId);
+        allow list: if isSignedIn() && resource.data.barberId == barberId;
+        allow create: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(ticketId)
+          && isValidQueueSlot(incoming())
+          && incoming().ticketId == ticketId
+          && incoming().barberId == barberId
+          && incoming().customerUid == request.auth.uid
+          && incoming().status == 'waiting'
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && existsAfter(/databases/$(database)/documents/barbers/$(barberId)/queue/$(ticketId));
+        allow update: if isVerifiedUser()
+          && isValidId(barberId)
+          && isValidId(ticketId)
+          && isValidQueueSlot(incoming())
+          && incoming().ticketId == existing().ticketId
+          && incoming().barberId == existing().barberId
+          && incoming().barberUid == existing().barberUid
+          && incoming().customerUid == existing().customerUid
+          && incoming().ticketNumber == existing().ticketNumber
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && existing().status != 'completed'
+          && existing().status != 'cancelled'
+          && (
+            existing().barberUid == request.auth.uid
+            || existing().customerUid == request.auth.uid
+          )
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'queueOrder', 'updatedAt']);
+        allow delete: if false;
+      }
+    }
+
+    // CollectionGroup read access for a customer's own active tickets across all barbers
+    match /{path=**}/queue/{ticketId} {
+      allow read: if isSignedIn() && resource.data.customerUid == request.auth.uid;
+    }
+
+    // CollectionGroup read access for incoming online voice calls for a customer or barber
+    match /{path=**}/calls/{callId} {
+      allow read: if isSignedIn() && (resource.data.customerUid == request.auth.uid || resource.data.barberUid == request.auth.uid);
+    }
+
+    // CollectionGroup read access for customer's submitted complaints and admin review
+    match /{path=**}/complaints/{complaintId} {
+      allow read: if isSignedIn() && (
+        resource.data.customerUid == request.auth.uid
+        || resource.data.barberUid == request.auth.uid
+        || isAdmin()
+      );
+    }
+
+    // CollectionGroup read access for admin/owner review of subscription payments
+    match /{path=**}/payments/{paymentId} {
+      allow read: if isSignedIn() && (
+        resource.data.barberUid == request.auth.uid
+        || isAdmin()
+      );
+    }
+  }
+}

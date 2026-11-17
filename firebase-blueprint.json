@@ -1,0 +1,1073 @@
+{
+  "entities": {
+    "PlatformSettings": {
+      "title": "PlatformSettings",
+      "description": "Global platform branding, designer attribution, owner contact, feature flags, language, payment accounts, and usage pricing controlled by the app owner.",
+      "type": "object",
+      "properties": {
+        "appName": {
+          "type": "string",
+          "description": "Custom application brand name.",
+          "minLength": 2,
+          "maxLength": 60
+        },
+        "appTagline": {
+          "type": "string",
+          "description": "Short subtitle describing the app.",
+          "minLength": 0,
+          "maxLength": 140
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Application owner display name.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "ownerPhone": {
+          "type": "string",
+          "description": "Application owner personal phone number.",
+          "minLength": 0,
+          "maxLength": 25
+        },
+        "designerName": {
+          "type": "string",
+          "description": "Application designer/creator attribution name.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "designerLocation": {
+          "type": "string",
+          "description": "Designer city/country attribution.",
+          "minLength": 0,
+          "maxLength": 80
+        },
+        "designerInstagram": {
+          "type": "string",
+          "description": "Designer Instagram handle.",
+          "minLength": 0,
+          "maxLength": 60
+        },
+        "pricingEnabled": {
+          "type": "boolean",
+          "description": "Whether barbershops require a paid subscription to use the platform."
+        },
+        "usagePrice": {
+          "type": "number",
+          "description": "Usage subscription price set by the platform owner."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency label (e.g. دج, USD, EUR).",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "billingCycle": {
+          "type": "string",
+          "enum": ["monthly", "yearly", "per_booking"],
+          "description": "Billing cadence for using the application."
+        },
+        "paymentInstructions": {
+          "type": "string",
+          "description": "Owner contact and payment instructions for activating subscriptions.",
+          "minLength": 0,
+          "maxLength": 300
+        },
+        "autoApproveCardPayments": {
+          "type": "boolean",
+          "description": "Automatically activate subscription on validated electronic card checkout."
+        },
+        "baridiMobRip": {
+          "type": "string",
+          "description": "Owner BaridiMob RIP for Algerian electronic payments.",
+          "minLength": 0,
+          "maxLength": 40
+        },
+        "ccpAccount": {
+          "type": "string",
+          "description": "Owner Algérie Poste CCP account number.",
+          "minLength": 0,
+          "maxLength": 40
+        },
+        "chargilyPayUrl": {
+          "type": "string",
+          "description": "Optional external Chargily Pay (Edahabia/CIB) checkout URL.",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "stripeCheckoutUrl": {
+          "type": "string",
+          "description": "Optional external international card checkout URL.",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "paypalLink": {
+          "type": "string",
+          "description": "Owner PayPal.me link or PayPal email.",
+          "minLength": 0,
+          "maxLength": 140
+        },
+        "wiseIban": {
+          "type": "string",
+          "description": "Owner Wise / Paysera / SEPA IBAN or account.",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        "heroTitle": {
+          "type": "string",
+          "description": "Landing page main headline controlled by platform owner.",
+          "minLength": 0,
+          "maxLength": 140
+        },
+        "heroSubtitle": {
+          "type": "string",
+          "description": "Landing page subtitle/description controlled by platform owner.",
+          "minLength": 0,
+          "maxLength": 300
+        },
+        "footerNote": {
+          "type": "string",
+          "description": "Optional custom footer note controlled by platform owner.",
+          "minLength": 0,
+          "maxLength": 140
+        },
+        "defaultTheme": {
+          "type": "string",
+          "enum": ["gold", "emerald", "blue", "burgundy", "dark"],
+          "description": "Default color theme applied for new users."
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "description": "Default ISO language code for the application.",
+          "minLength": 2,
+          "maxLength": 10
+        },
+        "allowVoiceCalls": {
+          "type": "boolean"
+        },
+        "allowWhatsApp": {
+          "type": "boolean"
+        },
+        "allowInAppMessages": {
+          "type": "boolean"
+        },
+        "allowDeferTurn": {
+          "type": "boolean"
+        },
+        "allowComplaints": {
+          "type": "boolean"
+        },
+        "allowBarberSocials": {
+          "type": "boolean"
+        },
+        "allowLocationFilter": {
+          "type": "boolean"
+        },
+        "allowNewBarberRegistration": {
+          "type": "boolean"
+        },
+        "allowAppDownload": {
+          "type": "boolean"
+        },
+        "androidDownloadUrl": {
+          "type": "string",
+          "description": "Optional direct Android APK or Google Play link configured by owner.",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "iosDownloadUrl": {
+          "type": "string",
+          "description": "Optional direct iOS App Store or TestFlight link configured by owner.",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "desktopDownloadUrl": {
+          "type": "string",
+          "description": "Optional direct Windows/macOS desktop installer link configured by owner.",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "maintenanceMode": {
+          "type": "boolean"
+        },
+        "maintenanceMessage": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "serviceHaircutLabel": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 50
+        },
+        "serviceProteinLabel": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 50
+        },
+        "serviceBlowdryLabel": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 50
+        },
+        "serviceAllLabel": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 60
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "appName",
+        "appTagline",
+        "ownerName",
+        "designerName",
+        "pricingEnabled",
+        "usagePrice",
+        "currency",
+        "billingCycle",
+        "paymentInstructions",
+        "updatedAt"
+      ]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user profile storing account mode, theme, language preference, and contact info.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 25
+        },
+        "accountMode": {
+          "type": "string",
+          "enum": ["customer", "barber"]
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128
+        },
+        "themeColor": {
+          "type": "string",
+          "enum": ["gold", "emerald", "blue", "burgundy", "dark"]
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 10
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "displayName", "phone", "accountMode", "createdAt", "updatedAt"]
+    },
+    "BarberShop": {
+      "title": "BarberShop",
+      "description": "Public barber worker and shop storefront profile with country, province, social media links, and live queue counters.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "barberName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "countryCode": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 10
+        },
+        "countryName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 80
+        },
+        "stateName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        "location": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 160
+        },
+        "avatarUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 80000
+        },
+        "whatsappCountryCode": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 6
+        },
+        "barberPhone": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 25
+        },
+        "facebookUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 200
+        },
+        "tiktokUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 200
+        },
+        "instagramUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 200
+        },
+        "isOpen": {
+          "type": "boolean"
+        },
+        "isPublished": {
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": ["active", "pending", "suspended"]
+        },
+        "lastPaymentId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128
+        },
+        "waitingCount": {
+          "type": "integer"
+        },
+        "nowServingNumber": {
+          "type": "integer"
+        },
+        "nextTicketCounter": {
+          "type": "integer"
+        },
+        "activeCallTicketId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128
+        },
+        "activeCallNumber": {
+          "type": "integer"
+        },
+        "avgMinutesPerClient": {
+          "type": "integer"
+        },
+        "services": {
+          "type": "array",
+          "maxLength": 4
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerUid",
+        "shopName",
+        "barberName",
+        "location",
+        "avatarUrl",
+        "isOpen",
+        "isPublished",
+        "waitingCount",
+        "nowServingNumber",
+        "nextTicketCounter",
+        "activeCallTicketId",
+        "activeCallNumber",
+        "avgMinutesPerClient",
+        "services",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SubscriptionPayment": {
+      "title": "SubscriptionPayment",
+      "description": "PCI-safe electronic subscription payment record submitted by a barber via Algerian or international payment methods.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "payerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "region": {
+          "type": "string",
+          "enum": ["algeria", "international"]
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": [
+            "edahabia",
+            "cib",
+            "baridimob",
+            "visa",
+            "mastercard",
+            "amex",
+            "unionpay",
+            "discover",
+            "jcb",
+            "mir",
+            "paypal",
+            "wise_paysera",
+            "apple_pay",
+            "google_pay"
+          ]
+        },
+        "cardBrand": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 30
+        },
+        "cardLast4": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4
+        },
+        "referenceCode": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "billingCycle": {
+          "type": "string",
+          "enum": ["monthly", "yearly", "per_booking"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["paid", "pending_review", "rejected"]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "barberId",
+        "barberUid",
+        "shopName",
+        "payerName",
+        "region",
+        "paymentMethod",
+        "referenceCode",
+        "amount",
+        "currency",
+        "billingCycle",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "QueueTicket": {
+      "title": "QueueTicket",
+      "description": "Private customer booking ticket containing customer phone number.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "barberLocation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "customerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 60
+        },
+        "customerPhone": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 25,
+          "pattern": "^[0-9+\\-\\s()]{6,25}$"
+        },
+        "serviceType": {
+          "type": "string",
+          "enum": ["haircut", "protein", "blowdry", "all"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["waiting", "called", "in_chair", "completed", "cancelled"]
+        },
+        "ticketNumber": {
+          "type": "integer"
+        },
+        "queueOrder": {
+          "type": "number"
+        },
+        "deferCount": {
+          "type": "integer"
+        },
+        "callCount": {
+          "type": "integer"
+        },
+        "lastBarberMessage": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 400
+        },
+        "lastBarberMessageAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastCalledAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "barberId",
+        "barberUid",
+        "shopName",
+        "barberLocation",
+        "customerUid",
+        "customerName",
+        "customerPhone",
+        "serviceType",
+        "status",
+        "ticketNumber",
+        "queueOrder",
+        "deferCount",
+        "callCount",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "QueueSlot": {
+      "title": "QueueSlot",
+      "description": "PII-free queue position slot.",
+      "type": "object",
+      "properties": {
+        "ticketId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ticketNumber": {
+          "type": "integer"
+        },
+        "queueOrder": {
+          "type": "number"
+        },
+        "serviceType": {
+          "type": "string",
+          "enum": ["haircut", "protein", "blowdry", "all"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["waiting", "called", "in_chair", "completed", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ticketId",
+        "barberId",
+        "barberUid",
+        "customerUid",
+        "ticketNumber",
+        "queueOrder",
+        "serviceType",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "TicketMessage": {
+      "title": "TicketMessage",
+      "description": "Real-time direct message between barber and customer.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ticketId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderRole": {
+          "type": "string",
+          "enum": ["barber", "customer"]
+        },
+        "senderName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ticketId",
+        "barberId",
+        "barberUid",
+        "customerUid",
+        "senderUid",
+        "senderRole",
+        "senderName",
+        "text",
+        "createdAt"
+      ]
+    },
+    "VoiceCall": {
+      "title": "VoiceCall",
+      "description": "WebRTC signaling session.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ticketId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ringing", "connected", "ended", "declined", "missed"]
+        },
+        "offerSdp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 15000
+        },
+        "answerSdp": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 15000
+        },
+        "endedByUid": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "barberId",
+        "barberUid",
+        "customerUid",
+        "ticketId",
+        "shopName",
+        "customerName",
+        "status",
+        "offerSdp",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "IceCandidateDoc": {
+      "title": "IceCandidateDoc",
+      "description": "WebRTC ICE candidate.",
+      "type": "object",
+      "properties": {
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "candidate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "sdpMid": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        "sdpMLineIndex": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "barberUid",
+        "customerUid",
+        "senderUid",
+        "candidate",
+        "sdpMid",
+        "sdpMLineIndex",
+        "createdAt"
+      ]
+    },
+    "BarberComplaint": {
+      "title": "BarberComplaint",
+      "description": "Customer complaint filed against a barbershop worker.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "barberUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "customerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "complaintType": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "details": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 500
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "reviewed", "resolved"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "barberId",
+        "barberUid",
+        "shopName",
+        "customerUid",
+        "customerName",
+        "complaintType",
+        "details",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/platform/{configId}": {
+      "schema": {
+        "$ref": "#/entities/PlatformSettings"
+      },
+      "description": "Platform owner branding, feature toggles, payment accounts, and usage pricing configuration."
+    },
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Private user account profiles, saved contact info, theme and language preferences."
+    },
+    "/barbers/{barberId}": {
+      "schema": {
+        "$ref": "#/entities/BarberShop"
+      },
+      "description": "Public barbershop worker profiles and live aggregate queue counters."
+    },
+    "/barbers/{barberId}/payments/{paymentId}": {
+      "schema": {
+        "$ref": "#/entities/SubscriptionPayment"
+      },
+      "description": "Subscription electronic payments submitted by barbers via Algerian or international methods."
+    },
+    "/barbers/{barberId}/queue/{ticketId}": {
+      "schema": {
+        "$ref": "#/entities/QueueTicket"
+      },
+      "description": "Private queue bookings containing customer phone numbers."
+    },
+    "/barbers/{barberId}/slots/{ticketId}": {
+      "schema": {
+        "$ref": "#/entities/QueueSlot"
+      },
+      "description": "PII-free queue order slots."
+    },
+    "/barbers/{barberId}/queue/{ticketId}/messages/{messageId}": {
+      "schema": {
+        "$ref": "#/entities/TicketMessage"
+      },
+      "description": "Direct real-time messages between the barber and customer."
+    },
+    "/barbers/{barberId}/calls/{callId}": {
+      "schema": {
+        "$ref": "#/entities/VoiceCall"
+      },
+      "description": "Online internet VoIP call signaling documents."
+    },
+    "/barbers/{barberId}/calls/{callId}/callerCandidates/{candidateId}": {
+      "schema": {
+        "$ref": "#/entities/IceCandidateDoc"
+      },
+      "description": "Caller WebRTC ICE candidates."
+    },
+    "/barbers/{barberId}/calls/{callId}/calleeCandidates/{candidateId}": {
+      "schema": {
+        "$ref": "#/entities/IceCandidateDoc"
+      },
+      "description": "Callee WebRTC ICE candidates."
+    },
+    "/barbers/{barberId}/complaints/{complaintId}": {
+      "schema": {
+        "$ref": "#/entities/BarberComplaint"
+      },
+      "description": "Customer complaints submitted against a barber worker."
+    }
+  }
+}

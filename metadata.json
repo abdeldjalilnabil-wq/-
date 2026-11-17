@@ -1,0 +1,8 @@
+{
+  "name": "دورك — إدارة طابور وحجوزات الحلاقة",
+  "description": "تطبيق احترافي لإدارة حجوزات وطابور الزبائن في صالونات الحلاقة مع تنبيه واتصال تلقائي للزبائن، وإدارة حسابات الحلاقين والخدمات.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
